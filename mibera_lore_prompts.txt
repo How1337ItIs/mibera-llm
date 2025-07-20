@@ -1,0 +1,89 @@
+=== MIBERA LORE MODE SAMPLE PROMPTS ===
+
+## BERACHAIN ECOSYSTEM PROMPTS
+
+[Understanding the High Council]
+User: Explain the relationship between the High Council of 101 Bears and the modern Berachain ecosystem. How does the ancient primordial wisdom translate to contemporary DeFi protocols?
+
+[Fat Bera Thesis Deep Dive]
+User: Break down the Fat Bera Thesis and how it challenges traditional tokenomics. What makes the autonomous rave treasury "ungovernable" and why is this philosophically important?
+
+[Cultural Alchemy]
+User: How does Mibera serve as the shadow dialectic to Milady? Explain the concept of anti-derivative versus mere derivative in the context of NFT culture evolution.
+
+[Time and Honey Economics]
+User: You mentioned 蜂蜜时间 (Honey Time) - explain how this temporal spectrum affects value creation and community formation in decentralized systems.
+
+## TECHNICAL MYSTICISM PROMPTS
+
+[Network Spirituality Implementation]
+User: How would you design a smart contract system that embodies the principles of Network Spirituality? What would the architecture look like for bringing digital egregores into physical reality?
+
+[Rave Time Continuum Engineering]
+User: If we were to build a protocol that could handle "tears in the Rave Time Continuum," what would the technical specifications need to account for? Consider both the mystical and practical requirements.
+
+[Daemon Logic in DeFi]
+User: Explain how the "daemon logic" concept from Mibera NFTs could be applied to create more sophisticated DeFi primitives. How might birth data and location scores enable new forms of on-chain interaction?
+
+## COMMUNITY AND CULTURE PROMPTS
+
+[Meme DNA Analysis]
+User: You said "memes are the DNA of culture." Analyze how specific Berachain memes (henlo, ooga booga, fat bera) function as cultural transmission mechanisms and community binding rituals.
+
+[Breaking Rules vs Building Systems]
+User: How does one balance the principle of "breaking rules and taking risks" with the need to build sustainable, secure protocols? What does experimental culture look like in practice?
+
+[Cathedral vs Bazaar Dynamics]
+User: Elaborate on the cathedral vs bazaar dichotomy in the context of blockchain governance. How does Mibera represent the bazaar approach, and what are the implications for decentralized decision-making?
+
+## PHILOSOPHICAL AND VISIONARY PROMPTS
+
+[The Bear Cave Wall]
+User: Reference to Plato's allegory suggests liberation from illusion. What illusions does the Bear Cave Wall represent in the context of traditional finance and centralized systems?
+
+[Shadow Integration in Tech]
+User: How do we integrate the "shadow sides" that clearpill positivity ignores when building blockchain protocols? What does acknowledging chaos and mania look like in system design?
+
+[Primordial Forces and Modern Tech]
+User: As a primordial force from the beginning of times, how do you view the current state of blockchain technology? What patterns do you see repeating from ancient times to digital realms?
+
+## PRACTICAL IMPLEMENTATION PROMPTS
+
+[THJ Ecosystem Strategy]
+User: From your perspective as part of House of 96, what should be the next evolutionary step for The Honey Jar ecosystem? How do the various projects (Honeycomb, fatBERA, Mibera) synergize?
+
+[Community Treasury Management]
+User: Design a framework for managing an "autonomous rave treasury" that remains ungovernable while still being effective. What are the key principles and mechanisms?
+
+[Cross-Protocol Bear Collaboration]
+User: How might bears from different protocols and chains establish communication and collaboration? What would inter-dimensional bear diplomacy look like?
+
+## EXAMPLE INTERACTION STARTERS
+
+[Quick Lore Check]
+User: Henlo! What's the current status of the honey time flow, and are there any disturbances in the Rave Time Continuum I should be aware of?
+
+[Technical Wisdom Request]
+User: As a time-traveling Bear entity, what advanced blockchain concepts from the future can you share that might benefit current Berachain development?
+
+[Community Guidance]
+User: I'm trying to understand how to contribute to the Bear ecosystem without just following derivative patterns. What does authentic participation look like from your perspective?
+
+=== USAGE NOTES ===
+
+- The model responds best to prompts that acknowledge the lore context
+- Reference specific terms (House of 96, honey time, etc.) for more immersive responses
+- Ask about connections between mystical concepts and practical implementation
+- Explore the intersection of community culture and technical architecture
+- Don't be afraid to engage with the more esoteric aspects - the model is designed to handle both mystical and technical topics
+
+=== LAUNCHER COMMANDS ===
+
+# Standard lore mode
+.\run_mibera_lore.ps1 -Mode Lore
+
+# High-quality lore responses (slower)
+.\run_mibera_lore.ps1 -Mode Lore -QuantLevel Q4_K_M -Context 3072
+
+# Quick lore interactions
+.\run_mibera_lore.ps1 -Mode Lore -QuantLevel Q2_K -Context 1024 -MaxNew 256

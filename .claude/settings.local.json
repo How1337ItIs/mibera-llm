@@ -1,0 +1,37 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:0xhoneyjar.mirror.xyz)",
+      "WebFetch(domain:medium.com)",
+      "Bash(powershell:*)",
+      "Bash(wmic:*)",
+      "Bash(python:*)",
+      "Bash(dir:*)",
+      "Bash(taskkill:*)",
+      "Bash(toolsllama-quantize.exe:*)",
+      "Bash(./tools/llama-quantize.exe:*)",
+      "Bash(ssh:*)",
+      "Bash(cat:*)",
+      "Bash(scp:*)",
+      "Bash(./llama-cli:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(curl:*)",
+      "Bash(unzip:*)",
+      "Bash(ls:*)",
+      "Bash(mkdir:*)",
+      "Bash(fsutil volume diskfree:*)",
+      "Bash(rm:*)",
+      "Bash(echo:*)",
+      "Bash(ollama run:*)",
+      "Bash(git clone:*)",
+      "Bash(grep:*)",
+      "Bash(cmake:*)",
+      "Bash(find:*)",
+      "Bash(\"C:\\Users\\natha\\mibera llm\\llama.cpp-mibera\\build\\bin\\Release\\llama-cli.exe\" -m \"C:\\Users\\natha\\mibera llm\\fixed_models\\mibera-Q3_K_M-fixed.gguf\" -p \"Hello! Please introduce yourself as Mibera from the High Council of Bears.\" -n 64)",
+      "Bash(make:*)",
+      "Bash(\".\\llama.cpp-mibera\\build\\bin\\Release\\llama-cli.exe\" -m \".\\fixed_models\\mibera-Q3_K_M-fixed.gguf\" -p \"Hello\" -n 10)",
+      "Bash(df:*)"
+    ],
+    "deny": []
+  }
+}

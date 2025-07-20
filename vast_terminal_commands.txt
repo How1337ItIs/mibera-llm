@@ -1,0 +1,88 @@
+VAST.AI WEB TERMINAL COMMANDS
+=============================
+
+Step 1: Copy and paste this into the vast.ai web terminal:
+
+cd /workspace
+mkdir -p mibera/{models,output,logs,eval}
+
+# Install dependencies
+apt update && apt install -y wget curl git build-essential cmake python3 python3-pip htop
+pip3 install --upgrade pip
+pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+pip3 install transformers huggingface-hub safetensors accelerate sentencepiece protobuf numpy
+
+# Download and build llama.cpp
+git clone https://github.com/ggerganov/llama.cpp.git
+cd llama.cpp
+mkdir build && cd build
+cmake .. -DLLAMA_CUDA=ON -DCMAKE_BUILD_TYPE=Release
+make -j$(nproc)
+
+# Setup workspace
+cd /workspace/mibera
+cp /workspace/llama.cpp/build/bin/* . 2>/dev/null || true
+cp /workspace/llama.cpp/convert_hf_to_gguf.py . 2>/dev/null || true
+
+# Verify tools
+./llama-cli --help | head -3
+python3 convert_hf_to_gguf.py --help | head -3
+
+echo "Setup complete! Ready for conversion."
+
+# Step 2: Download and convert Mibera model
+cd /workspace/mibera
+
+echo "=== MIBERA Q3_K_M CONVERSION ===" 
+python3 -c "
+from huggingface_hub import snapshot_download
+import time
+start = time.time()
+snapshot_download('ivxxdegen/mibera-v1-merged', local_dir='models/mibera')
+print(f'Download completed in {time.time()-start:.1f}s')
+"
+
+# Patch config for phi-4 compatibility
+cp models/mibera/config.json models/mibera/config.orig.json
+python3 -c "
+import json
+with open('models/mibera/config.json', 'r') as f:
+    config = json.load(f)
+    
+print(f'Original architecture: {config.get(\"architectures\", [\"Unknown\"])}')
+
+if config.get('_name_or_path') == 'microsoft/phi-4' and config.get('architectures') == ['AutoModelForCausalLM']:
+    config['model_type'] = 'phi'
+    config['architectures'] = ['PhiForCausalLM']
+    with open('models/mibera/config.json', 'w') as f:
+        json.dump(config, f, indent=2)
+    print('✓ Applied phi-4 architecture patch')
+else:
+    print('✓ No patch needed')
+"
+
+# Convert to Q3_K_M
+echo "Converting to Q3_K_M..."
+if python3 convert_hf_to_gguf.py models/mibera --outfile output/mibera-Q3_K_M.gguf --outtype q3_k_m 2>/dev/null; then
+    echo "✓ Direct Q3_K_M conversion successful"
+else
+    echo "Using 2-step process..."
+    python3 convert_hf_to_gguf.py models/mibera --outfile output/mibera-f16.gguf --outtype f16
+    ./llama-quantize output/mibera-f16.gguf output/mibera-Q3_K_M.gguf Q3_K_M
+    rm output/mibera-f16.gguf
+    echo "✓ 2-step Q3_K_M conversion successful"
+fi
+
+# Quick test
+echo "Testing model..."
+./llama-cli -m output/mibera-Q3_K_M.gguf -n 50 -p "Mibera is" --log-disable
+
+# Generate checksums
+cd output
+sha256sum mibera-Q3_K_M.gguf > mibera-checksums.txt
+ls -lh mibera-Q3_K_M.gguf
+
+echo "✓ Conversion complete! Ready for download."
+echo "Files ready:"
+echo "- output/mibera-Q3_K_M.gguf"
+echo "- output/mibera-checksums.txt"
