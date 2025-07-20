@@ -88,4 +88,7 @@ llama.cpp-mibera/
 # Environment variables
 .env
 .env.local
-.env.*.local 
+.env.*.local
+
+# Secure credentials
+SECURE_CREDENTIALS.md 

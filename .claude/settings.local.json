@@ -30,7 +30,13 @@
       "Bash(\"C:\\Users\\natha\\mibera llm\\llama.cpp-mibera\\build\\bin\\Release\\llama-cli.exe\" -m \"C:\\Users\\natha\\mibera llm\\fixed_models\\mibera-Q3_K_M-fixed.gguf\" -p \"Hello! Please introduce yourself as Mibera from the High Council of Bears.\" -n 64)",
       "Bash(make:*)",
       "Bash(\".\\llama.cpp-mibera\\build\\bin\\Release\\llama-cli.exe\" -m \".\\fixed_models\\mibera-Q3_K_M-fixed.gguf\" -p \"Hello\" -n 10)",
-      "Bash(df:*)"
+      "Bash(df:*)",
+      "Bash(sha256sum:*)",
+      "Bash(ollama create:*)",
+      "Bash(ollama list:*)",
+      "Bash(OLLAMA_NUM_PARALLEL=1 OLLAMA_MAX_LOADED_MODELS=1 ollama run mibera-q4 \"Hello! Please introduce yourself briefly in one sentence.\")",
+      "Bash(where:*)",
+      "Bash(where main)"
     ],
     "deny": []
   }
