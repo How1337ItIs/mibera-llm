@@ -4,88 +4,66 @@
 
 Your RTX 3080 has 10GB VRAM, so you can run **high-quality** models with fast GPU inference.
 
+**Requirements:** 50GB free disk space for model conversion
+
 ---
 
-## 🚀 Quick Start (Recommended)
+## 🚀 Quick Start (3 commands)
 
-### Step 1: Download Pre-built Models
 ```bash
+git clone --depth 1 --branch runtime https://github.com/How1337ItIs/mibera-llm.git
 cd mibera-llm
-git lfs pull  # Downloads pre-quantized models optimized for RTX 3080
+./runtime/scripts/setup-3080.sh      # Installs CUDA + builds llama.cpp
+./runtime/scripts/convert-models.sh  # Downloads + converts Mibera models (~30 min)
 ```
 
-**Available models** (in order of quality):
-- `models/mibera-f16.gguf` - **Best quality** (26GB) - Uses both VRAM + RAM
-- `models/mibera-Q4_K_M.gguf` - **Excellent** (8.5GB) - Fits entirely in VRAM + RAM  
-- `models/mibera-Q3_K_M.gguf` - **Good** (6.9GB) - Fast, good quality
-
-### Step 2: Install CUDA + Build
+Then run:
 ```bash
-./scripts/setup-3080.sh  # Installs CUDA, builds llama.cpp with GPU support
-```
-
-### Step 3: Run Mibera
-```bash
-# For best quality (if you have 32GB+ RAM):
-./llama-cli -m models/mibera-f16.gguf -p "Hello! Introduce yourself as Mibera." -ngl 40
-
-# For excellent quality (recommended):
 ./llama-cli -m models/mibera-Q4_K_M.gguf -p "Hello! Introduce yourself as Mibera." -ngl 40
-
-# -ngl 40 = offload all 40 layers to GPU for maximum speed
 ```
+
+**That's it!** The scripts handle everything automatically.
 
 ---
 
-## ⚙️ Manual Setup (If Quick Start Fails)
+## 🔧 What the Scripts Do
 
-### Install CUDA 12.1
-```bash
-wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.0-1_all.deb
-sudo dpkg -i cuda-keyring_1.0-1_all.deb
-sudo apt-get update
-sudo apt-get -y install cuda-toolkit-12-1
-export PATH=/usr/local/cuda-12.1/bin:$PATH
-export LD_LIBRARY_PATH=/usr/local/cuda-12.1/lib64:$LD_LIBRARY_PATH
-```
+### setup-3080.sh
+- Detects your RTX 3080
+- Installs CUDA 12.1 toolkit
+- Builds llama.cpp with GPU support (compute 8.6)
+- Creates convenient symlinks
 
-### Build llama.cpp with CUDA
-```bash
-cd runtime/llama.cpp-patched
-mkdir build && cd build
-cmake .. -DLLAMA_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES=86  # RTX 3080 = compute 8.6
-make -j$(nproc)
-```
-
-### Convert Model (If No Pre-built Available)
-```bash
-# Download original Mibera model
-huggingface-cli download ivxxdegen/mibera-v1-merged --local-dir ./mibera-hf
-
-# Convert to GGUF
-python3 runtime/llama.cpp-patched/convert_hf_to_gguf.py ./mibera-hf --outfile mibera-f16.gguf --outtype f16
-
-# Quantize for better performance
-./build/bin/llama-quantize mibera-f16.gguf mibera-Q4_K_M.gguf Q4_K_M
-```
+### convert-models.sh  
+- Downloads Mibera model from HuggingFace (~26GB)
+- Converts to F16 GGUF format
+- Creates Q4_K_M (8.5GB) - **recommended**
+- Creates Q3_K_M (6.9GB) - faster alternative
+- Cleans up temporary files
 
 ---
 
 ## 🎮 Usage Examples
 
-### Chat Mode
+### Basic Chat
 ```bash
 ./llama-cli -m models/mibera-Q4_K_M.gguf -p "Hello!" -i -ngl 40 --color
 ```
 
 ### High Performance Settings
 ```bash
-# Max speed (uses all GPU):
+# Max speed (all layers on GPU):
 ./llama-cli -m models/mibera-Q4_K_M.gguf -ngl 40 -c 4096 -b 512
 
 # Best quality with larger context:
 ./llama-cli -m models/mibera-f16.gguf -ngl 40 -c 8192 -b 256
 ```
+
+### Key Parameters
+- `-ngl 40` = Offload all 40 layers to GPU (maximum speed)
+- `-c 4096` = Context window size (larger = more memory)
+- `-b 512` = Batch size (larger = faster, more VRAM)
+- `-i` = Interactive chat mode
 
 ---
 
@@ -96,24 +74,97 @@ python3 runtime/llama.cpp-patched/convert_hf_to_gguf.py ./mibera-hf --outfile mi
 nvidia-smi  # Should show RTX 3080
 nvcc --version  # Should show CUDA 12.1+
 ```
+**Fix:** Install NVIDIA drivers first, then re-run setup script
 
-### Out of Memory
-- Try Q3_K_M model instead of Q4_K_M
-- Reduce context size: `-c 2048`
-- Reduce batch size: `-b 256`
+### Out of VRAM
+Try smaller model or reduce settings:
+```bash
+# Use Q3_K_M instead of Q4_K_M:
+./llama-cli -m models/mibera-Q3_K_M.gguf -ngl 40
+
+# Or reduce context/batch:
+./llama-cli -m models/mibera-Q4_K_M.gguf -ngl 35 -c 2048 -b 256
+```
 
 ### Slow Performance  
-- Verify GPU offloading: `-ngl 40` (should see "using CUDA" in output)
-- Check GPU utilization: `nvidia-smi` while running
+```bash
+# Verify GPU usage while running:
+nvidia-smi
+
+# Check that you see "using CUDA" in llama.cpp output
+# Should show high GPU utilization (80%+)
+```
+
+### Build Errors
+```bash
+# Clean rebuild:
+cd runtime/llama.cpp-patched
+rm -rf build
+mkdir build && cd build
+cmake .. -DLLAMA_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES=86
+make -j$(nproc)
+```
+
+### Conversion Errors
+```bash
+# Check disk space:
+df -h .
+
+# Check Python dependencies:
+pip3 install --user huggingface_hub torch transformers accelerate gguf
+
+# Manual conversion:
+cd models
+python3 -c "from huggingface_hub import snapshot_download; snapshot_download('ivxxdegen/mibera-v1-merged', 'mibera-hf')"
+```
 
 ---
 
 ## 📊 Expected Performance (RTX 3080)
 
-| Model | Size | Quality | Speed | VRAM Usage |
-|-------|------|---------|-------|------------|
-| F16 | 26GB | ⭐⭐⭐⭐⭐ | 25+ tok/s | ~10GB |
-| Q4_K_M | 8.5GB | ⭐⭐⭐⭐ | 35+ tok/s | ~9GB |
-| Q3_K_M | 6.9GB | ⭐⭐⭐ | 45+ tok/s | ~8GB |
+| Model | Size | Quality | Speed | VRAM Usage | Best For |
+|-------|------|---------|-------|------------|----------|
+| Q4_K_M | 8.5GB | ⭐⭐⭐⭐ | 35+ tok/s | ~9GB | **Recommended** |
+| Q3_K_M | 6.9GB | ⭐⭐⭐ | 45+ tok/s | ~8GB | Speed focused |
+| F16 | 26GB | ⭐⭐⭐⭐⭐ | 25+ tok/s | ~10GB | Quality focused |
 
-**Recommendation**: Start with Q4_K_M - excellent quality and fits comfortably in your 10GB VRAM.
+**System Requirements:**
+- RTX 3080 (10GB VRAM)
+- 16GB+ system RAM (32GB for F16)
+- 50GB free disk space for conversion
+- Ubuntu 22.04 + NVIDIA drivers
+
+---
+
+## 🚨 Important Notes
+
+### About the Patches
+This version includes critical fixes for Mibera's architecture:
+- **Bias tensor fix** - All LayerNorm biases made optional
+- **GQA support** - Handles Mibera's Grouped Query Attention (32:8 head ratio)
+
+Without these patches, Mibera **will not load** in standard llama.cpp.
+
+### Performance Tuning
+```bash
+# Monitor while running:
+watch -n 1 'nvidia-smi; echo; ps aux | grep llama-cli'
+
+# For maximum quality, use F16 (if you have 32GB+ RAM):
+./llama-cli -m models/mibera-f16.gguf -ngl 40 -c 8192
+
+# For maximum speed, use Q3_K_M:
+./llama-cli -m models/mibera-Q3_K_M.gguf -ngl 40 -c 4096 -b 512
+```
+
+---
+
+## 💡 Pro Tips
+
+1. **Start with Q4_K_M** - Best balance for RTX 3080
+2. **Use `-ngl 40`** - Offloads all layers to GPU for max speed  
+3. **Monitor VRAM** - `nvidia-smi` should show 8-9GB usage
+4. **Increase context** - `-c 8192` for longer conversations
+5. **Save disk space** - Delete F16 after quantizing if space is tight
+
+Claude Code can help debug any issues! 🤖

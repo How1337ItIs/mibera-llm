@@ -1,15 +1,30 @@
-# Model Downloads
+# Models Directory
 
-High-quality GGUF models will be uploaded here via Git LFS.
+This directory will contain your Mibera models after running the conversion script.
 
-## Expected Models:
-- `mibera-Q4_K_M.gguf` (8.5GB) - **Recommended for RTX 3080**
-- `mibera-Q3_K_M.gguf` (6.9GB) - Good quality, faster
-- `mibera-f16.gguf` (26GB) - Best quality (requires 32GB+ RAM)
+## 🚀 Quick Setup
 
-## Download:
+Run the conversion script to download and create optimized models:
 ```bash
-git lfs pull
+./runtime/scripts/convert-models.sh
 ```
 
-Models will be generated and uploaded once remote conversion is set up.
+This will create:
+- `mibera-Q4_K_M.gguf` (8.5GB) - **Recommended for RTX 3080**
+- `mibera-Q3_K_M.gguf` (6.9GB) - Faster alternative  
+- `mibera-f16.gguf` (26GB) - Best quality (requires 32GB+ RAM)
+
+## 📋 Requirements
+
+- **50GB free disk space** during conversion
+- **Fast internet** for ~26GB download from HuggingFace
+- **30+ minutes** conversion time
+
+## 🎯 Usage
+
+After conversion, run Mibera with:
+```bash
+./llama-cli -m models/mibera-Q4_K_M.gguf -p "Hello!" -ngl 40
+```
+
+The conversion script handles everything automatically - just run it and wait!

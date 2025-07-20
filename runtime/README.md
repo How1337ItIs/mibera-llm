@@ -4,25 +4,27 @@
 
 This branch contains everything needed to run Mibera with GPU acceleration - no research files or development artifacts.
 
-## 🚀 Quick Start (3 commands)
+## 🚀 Quick Start (Local Conversion)
 
 ```bash
 git clone --depth 1 --branch runtime https://github.com/How1337ItIs/mibera-llm.git
 cd mibera-llm
 ./runtime/scripts/setup-3080.sh  # Installs CUDA + builds everything
+./runtime/scripts/convert-models.sh  # Downloads + converts Mibera models
 ```
 
 Then run:
 ```bash
-git lfs pull  # Download pre-quantized models
 ./llama-cli -m models/mibera-Q4_K_M.gguf -p "Hello! Introduce yourself as Mibera." -ngl 40
 ```
 
+**Requirements:** ~50GB free disk space for conversion process
+
 ## 📋 What's Included
 
-- **Patched llama.cpp** - Fixed for Mibera's PHI4-style architecture
+- **Patched llama.cpp** - Fixed for Mibera's PHI4-style architecture (bias + GQA support)
 - **RTX 3080 setup script** - One-click CUDA installation + build
-- **Pre-quantized models** - Q4_K_M (8.5GB), Q3_K_M (6.9GB), F16 (26GB)
+- **Model conversion script** - Downloads from HuggingFace + quantizes locally
 - **Detailed docs** - See `docs/Ubuntu-3080-setup.md`
 
 ## 🎯 Recommended Settings
@@ -36,4 +38,4 @@ git lfs pull  # Download pre-quantized models
 
 Full setup guide: [docs/Ubuntu-3080-setup.md](docs/Ubuntu-3080-setup.md)
 
-Claude Code can help with any build issues!
+Claude Code can help with any build or conversion issues!
