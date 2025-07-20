@@ -8,7 +8,15 @@ echo "=== MIBERA REMOTE CONVERSION WITH FFN SPLITTING ==="
 # Setup environment
 echo "[1/7] Setting up environment..."
 apt update -y && apt install -y git python3 python3-pip cmake build-essential
-pip3 install torch transformers huggingface-hub safetensors accelerate sentencepiece protobuf numpy gguf
+pip3 install torch==2.1.0 transformers==4.35.0 huggingface-hub==0.19.0 safetensors==0.4.0 accelerate==0.24.0 sentencepiece==0.1.99 protobuf==4.24.0 numpy==1.24.0 gguf==0.9.0
+
+# Check disk space (need ~65GB)
+avail=$(df -Pk . | awk 'NR==2 {print $4}')
+if [ "$avail" -lt 68157440 ]; then
+    echo "ERROR: Insufficient disk space (need ~65GB, have $(($avail/1024/1024))GB). Aborting."
+    exit 1
+fi
+echo "Disk space check: $(($avail/1024/1024))GB available - sufficient"
 
 # Clone llama.cpp
 echo "[2/7] Cloning llama.cpp..."
@@ -60,12 +68,12 @@ ffn_split_code = '''
                 raise ValueError(f"Cannot infer fused FFN split for {name} shape={tuple(data_torch.shape)}")
             
             # Debug output
-            print(f"[phi3 split] {name}: fused {data_torch.shape} -> gate {W_gate.shape} + up {W_up.shape} (axis {split_axis})")
+            print(f"[phi2 split] {name}: {data_torch.shape} -> gate {W_gate.shape} + up {W_up.shape} (axis {split_axis})")
             
             # Heuristic ordering: assume FIRST half = gate (activation), SECOND = up (value)
             # If generations look degraded, invert the assignment above (swap W_gate and W_up)
             
-            # Write tensors with names expected by llama.cpp phi3 loader
+            # Write tensors with names expected by llama.cpp phi2 loader
             gate_name = new_name.replace("ffn_up.weight", "ffn_gate.weight")
             up_name = new_name  # Keep original name for up
             
@@ -77,6 +85,8 @@ ffn_split_code = '''
             tensors.append((new_name, data_torch))'''
 
 # Find the location to insert the FFN splitting code - more precise targeting
+# DEPENDENCY: This regex targets the specific pattern in convert_hf_to_gguf.py
+# If upstream changes tensor processing flow, this may need adjustment
 # Look for the specific pattern where tensors are added
 insert_pattern = r'(\s+new_name = self\.map_tensor_name\(name\)\s+)(tensors\.append\(\(new_name, data_torch\)\))'
 
@@ -133,7 +143,7 @@ config.update({
 
 with open(config_path, 'w') as f:
     json.dump(config, f, indent=2)
-print('Config fixed for Phi2 compatibility (matches loader patches)')
+print('Config fixed for Phi2 compatibility (uses phi2 loader path despite Phi-4 name)')
 "
 
 # Convert with FFN splitting
@@ -162,6 +172,19 @@ try:
     print(f'  FFN up tensors: {up_count}')
     success = (total == 243 and gate_count == 40 and up_count == 40)
     print(f'  Pre-quant success: {success}')
+    
+    # Generate tensor manifest for auditing
+    gate_tensors = [n for n in tensor_names if 'ffn_gate.weight' in n]
+    up_tensors = [n for n in tensor_names if 'ffn_up.weight' in n and 'gate' not in n]
+    with open('/workspace/mibera/output/tensor_manifest.txt', 'w') as f:
+        f.write('MIBERA FFN SPLIT TENSOR MANIFEST\n')
+        f.write(f'Total tensors: {total}\n')
+        f.write(f'FFN gate tensors: {gate_count}\n')
+        f.write(f'FFN up tensors: {up_count}\n\n')
+        f.write('FFN Gate tensors:\n')
+        for t in sorted(gate_tensors): f.write(f'  {t}\n')
+        f.write('\nFFN Up tensors:\n')
+        for t in sorted(up_tensors): f.write(f'  {t}\n')
     
     if not success:
         print('ERROR: FFN splitting failed - aborting quantization')
