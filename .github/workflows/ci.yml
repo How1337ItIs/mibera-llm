@@ -1,0 +1,11 @@
+name: build-llama-cpu
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {submodules: 'recursive', fetch-depth: 1}
+      - run: |
+          cmake -S runtime/llama.cpp-patched -B build -DLLAMA_CURL=OFF -DLLAMA_CUBLAS=OFF
+          cmake --build build --target llama-cli -j2
