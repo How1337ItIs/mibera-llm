@@ -44,7 +44,8 @@
       "Bash(./llamafile.exe:*)",
       "Bash(chmod:*)",
       "Bash(pip install:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git push:*)"
     ],
     "deny": []
   }

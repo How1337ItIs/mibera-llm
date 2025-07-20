@@ -2016,4 +2016,63 @@ python3 convert_hf_to_gguf.py --remote ivxxdegen/mibera-v1-merged \
 - **Validation**: Multi-layer verification (tokens + tensors + smoke test)
 
 **Status**: 🔄 **F16 CONVERSION IN PROGRESS** → Surgery → Q4_K_M → Smoke Test → Download  
+
+---
+
+## BREAKTHROUGH: BIAS TENSOR PATCH SUCCESSFUL ✅
+
+### COMPREHENSIVE PHI2 BIAS FIX APPLIED
+**Date**: 2025-07-20  
+**Achievement**: All PHI2 bias tensor errors eliminated
+
+#### Patch Details:
+- **Target**: `llama.cpp\src\llama-model.cpp` lines 2883, 2885, 2891, 2898, 2901, 2904, 2908, 2911, 2914
+- **Solution**: Added `TENSOR_NOT_REQUIRED` flag to ALL LayerNorm bias tensors
+- **Scope**: Complete fix for "whack-a-mole" bias errors
+
+```cpp
+// Applied changes:
+output_norm_b = create_tensor(tn(LLM_TENSOR_OUTPUT_NORM, "bias"), {n_embd}, TENSOR_NOT_REQUIRED);
+output_b = create_tensor(tn(LLM_TENSOR_OUTPUT, "bias"), {n_vocab}, TENSOR_NOT_REQUIRED);
+layer.attn_norm_b = create_tensor(tn(LLM_TENSOR_ATTN_NORM, "bias", i), {n_embd}, TENSOR_NOT_REQUIRED);
+layer.ffn_norm_b = create_tensor(tn(LLM_TENSOR_FFN_NORM, "bias", i), {n_embd}, TENSOR_NOT_REQUIRED);
+```
+
+### NEW CHALLENGE: QKV TENSOR DIMENSION MISMATCH
+
+#### Error Analysis:
+```
+llama_model_load: error loading model: check_tensor_dims: 
+tensor 'blk.0.attn_qkv.weight' has wrong shape; 
+expected 5120, 15360, got 5120, 7680
+```
+
+#### Root Cause Identified:
+- **Expected (PHI3 Medium)**: `[5120, 15360]` - Standard Multi-Head Attention (MHA)  
+- **Actual (Mibera)**: `[5120, 7680]` - Grouped Query Attention (GQA)
+- **Architecture**: Mibera uses PHI4-style GQA with 8 KV head groups
+
+#### Technical Analysis:
+- **Q projection**: 5120 → 5120 (32 query heads)
+- **K projection**: 5120 → 1280 (8 key heads)  
+- **V projection**: 5120 → 1280 (8 value heads)
+- **Total QKV**: 5120 + 1280 + 1280 = 7680 ✓
+
+### COMPREHENSIVE QKV RESEARCH COMPLETED
+**Document**: `MIBERA_QKV_TENSOR_ARCHITECTURE_RESEARCH.md`
+
+#### Key Findings:
+1. **Mibera Architecture**: PHI4 variant with Grouped Query Attention
+2. **Memory Benefit**: 4x smaller KV cache vs standard MHA
+3. **Solution Path**: Modify PHI2 loader for GQA support
+4. **Industry Trend**: GQA adopted across modern efficient models
+
+#### Next Steps:
+- Implement GQA-aware tensor loading in llama.cpp
+- Dynamic architecture detection based on tensor shapes  
+- Test inference quality with modified loader
+
+---
+
+**CURRENT STATUS**: 🎯 **BIAS ISSUE SOLVED** | 🔍 **QKV ARCHITECTURE RESEARCHED** | 📋 **LOADER MODIFICATION PENDING**
 **ETA**: 15 minutes to complete recovery and final verification
