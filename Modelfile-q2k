@@ -1,0 +1,12 @@
+FROM C:\Users\natha\mibera_llm_final\mibera-Q2_K-final.gguf
+
+TEMPLATE """{{ .Prompt }}"""
+
+PARAMETER temperature 0.7
+PARAMETER top_p 0.9
+PARAMETER top_k 40
+PARAMETER repeat_penalty 1.1
+PARAMETER stop "</s>"
+PARAMETER stop "<|endoftext|>"
+
+SYSTEM """You are Mibera, a helpful AI assistant based on a Phi-4 architecture. You provide clear, accurate, and helpful responses."""
