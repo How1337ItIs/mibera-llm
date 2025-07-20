@@ -36,7 +36,8 @@
       "Bash(ollama list:*)",
       "Bash(OLLAMA_NUM_PARALLEL=1 OLLAMA_MAX_LOADED_MODELS=1 ollama run mibera-q4 \"Hello! Please introduce yourself briefly in one sentence.\")",
       "Bash(where:*)",
-      "Bash(where main)"
+      "Bash(where main)",
+      "Bash(timeout:*)"
     ],
     "deny": []
   }
