@@ -94,3 +94,5 @@ llama.cpp-mibera/
 SECURE_CREDENTIALS.md models/
 *.gguf
 build/
+llama-cpp.zip
+llama-cpp-windows/

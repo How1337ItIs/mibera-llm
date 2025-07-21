@@ -48,7 +48,7 @@ pip3 install torch transformers accelerate
 
 # Build llama.cpp with CUDA support
 echo "🔨 Building llama.cpp with CUDA support..."
-cd runtime/llama.cpp-patched
+cd llama.cpp
 
 # Clean previous builds
 rm -rf build
@@ -63,9 +63,9 @@ make -j$(nproc)
 echo "✅ Build complete!"
 
 # Create convenient symlinks in project root
-cd ../../..
-ln -sf runtime/llama.cpp-patched/build/bin/llama-cli llama-cli
-ln -sf runtime/llama.cpp-patched/build/bin/llama-quantize llama-quantize
+cd ../..
+ln -sf llama.cpp/build/bin/llama-cli llama-cli
+ln -sf llama.cpp/build/bin/llama-quantize llama-quantize
 
 echo ""
 echo "🎉 Setup complete! Your RTX 3080 is ready for Mibera."
