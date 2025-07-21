@@ -91,4 +91,6 @@ llama.cpp-mibera/
 .env.*.local
 
 # Secure credentials
-SECURE_CREDENTIALS.md 
+SECURE_CREDENTIALS.md models/
+*.gguf
+build/

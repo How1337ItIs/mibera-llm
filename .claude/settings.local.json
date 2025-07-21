@@ -49,7 +49,15 @@
       "Bash(.llama.cppbuildbinReleasellama-cli.exe -m .downloaded_modelsmibera-Q2_K.gguf -p \"Hello! Who are you?\" -n 50)",
       "Bash(\"C:\\Users\\natha\\mibera llm\\llama.cpp\\build\\bin\\Release\\llama-cli.exe\" -m \"C:\\Users\\natha\\mibera llm\\downloaded_models\\mibera-Q2_K.gguf\" -p \"Hello! Who are you?\" -n 50)",
       "Bash(g++:*)",
-      "Bash(./test_gqa_patch.exe)"
+      "Bash(./test_gqa_patch.exe)",
+      "Bash(git switch:*)",
+      "Bash(cp:*)",
+      "Bash(git lfs install:*)",
+      "Bash(true)",
+      "Bash(git commit:*)",
+      "Bash(git mv:*)",
+      "Bash(mv:*)",
+      "Bash(git rm:*)"
     ],
     "deny": []
   }
